@@ -2,8 +2,6 @@
 #include "matrix.cuh"
 
 
-
-
 int getThreadNum(int gpu = 0)
 {
     cudaDeviceProp prop;

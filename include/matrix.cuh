@@ -1,17 +1,7 @@
-#include <stdio.h>
+#pragma once
 
-static void HandleError(cudaError_t err,
-                        const char *file,
-                        int line)
-{
-    if (err != cudaSuccess)
-    {
-        printf("%s in $s at line $d\n",
-               cudaGetErrorString(err), file, line);
-        exit(EXIT_FAILURE);
-    }
-}
-#define HANDLE_ERROR(err) (HandleError(err, __FILE__, __LINE__))
+#include <stdio.h>
+#include "error.cuh"
 
 
 template <typename T = int>
@@ -25,7 +15,6 @@ struct Matrix
     {
         data = new T[width * height];
     }
-
     Matrix(const Index &n) : Matrix(n, n)
     {
     }
@@ -39,27 +28,16 @@ struct Matrix
             HANDLE_ERROR(cudaFree(dataCUDA));
     }
 
-    // 读取或设置某个值
+    /**  读取或设置某个值
+    * \param row  [IN] 
+    * \param col  [IN] 
+    * \return 对应的位置，可读可写
+    */
     T &operator()(const Index &row, const Index &col)
     {
         return data[col + row * width];
     }
-    T getData(const Index &row, const Index &col)
-    {
-        return data[col + row * width];
-    }
-    auto getLength() const
-    {
-        return width * height;
-    }
-    auto getWidth() const
-    {
-        return width;
-    }
-    auto getHeight() const
-    {
-        return height;
-    }
+
     auto printData(int maxWidth = 5, int maxHeight = 5, const char *printFormat = "%3.0f ")
     {
         int _width = width > maxWidth ? maxWidth : width,
@@ -101,4 +79,17 @@ struct Matrix
 
 private:
     Index width, height;
+public:
+    auto getLength() const
+    {
+        return width * height;
+    }
+    auto getWidth() const
+    {
+        return width;
+    }
+    auto getHeight() const
+    {
+        return height;
+    }
 };
